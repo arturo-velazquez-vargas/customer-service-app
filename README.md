@@ -84,3 +84,17 @@ export ENABLE_DOCKER_TESTS=true
 - Postgres 16 (via Docker Compose)
 - HTMX + Thymeleaf for server-rendered UI
 - Web Awesome for components + design tokens
+
+## Why do we import /css/app.css if Web Awesome docs don’t mention it?
+Web Awesome provides the design system (tokens, themes, components). Our `app.css` is a tiny, site-specific layer where we:
+- Apply layout primitives (container width, card spacing) using Web Awesome tokens
+- Polish the table (sticky header, zebra striping, hover) and form spacing
+- Add small UX niceties (skeleton placeholder, button loading spinner)
+
+It’s optional. If you want to rely only on Web Awesome defaults, delete the line in `templates/index.html`:
+
+```html
+<link rel="stylesheet" href="/css/app.css?v=2">
+```
+
+The UI will still work with Web Awesome’s default theme, but you’ll lose our custom spacing and table polish. You can also trim `app.css` to only keep what you like.
