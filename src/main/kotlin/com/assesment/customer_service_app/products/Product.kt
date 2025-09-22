@@ -1,4 +1,4 @@
-package com.assesment.customer_service_app.products
+package com.assesment.customer_service_app.product.domain
 
 import java.math.BigDecimal
 import java.time.OffsetDateTime
