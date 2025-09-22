@@ -1,122 +1,134 @@
 # Customer Service App
 
-This project is a Kotlin + Spring Boot 3.5 app using HTMX + Thymeleaf for UI, Postgres + Flyway for the database, and a scheduled importer that pulls products from famme.no. Web Awesome is used for styling/components.
+A modern Kotlin + Spring Boot web app that showcases a marketplace-like UI using HTMX + Thymeleaf and Web Awesome components. Data is stored in Postgres with Flyway migrations. A scheduled job imports up to 50 products from famme.no and stores variants as JSONB.
 
-This README gives you everything needed to run a local Postgres with Docker Compose, run the app, and test the UI and endpoints.
+This README covers setup, development workflow (with hot reload), key features, and troubleshooting.
 
-## Prerequisites
-- Java 21 (project uses Java toolchain 21)
-- Docker + Docker Compose
-- IntelliJ IDEA Ultimate recommended (DB client + HTTP client)
+## Features
+- Products page with HTMX-powered table that loads and refreshes without full page reloads
+- Add Product form (Web Awesome components) that inserts and updates the table inline
+- Live search page with active results as you type
+- Edit product page (update title, price, URL)
+- Delete product with HTMX confirmation and inline refresh
+- Scheduled importer (initialDelay=0) pulls products from https://famme.no/products.json (max 50)
+- Variants persisted in a JSONB column for flexibility
 
-## Start Postgres with Docker Compose
-From the project root:
+## Tech stack (versions)
+- Spring Boot 3.5.6
+- Kotlin 2.0.21
+- Java toolchain 25 (emits Java 22 bytecode for Kotlin compatibility)
+- Postgres 16 + Flyway
+- HTMX + Thymeleaf
+- Web Awesome v3 beta (components + design tokens)
+- Testcontainers (optional integration test)
 
+## Quick start
+1) Start Postgres with Docker Compose
 ```bash
 docker compose up -d
-# Wait until status is healthy
+# Wait until the container is healthy
 docker compose ps
 ```
+Database connection (defaults):
+- JDBC URL: `jdbc:postgresql://localhost:5432/customer_service_app`
+- User: `postgres`
+- Password: `postgres`
 
-The DB will be available at:
-- URL: jdbc:postgresql://localhost:5432/customer_service_app
-- User: postgres
-- Password: postgres
-
-The application already has defaults matching this configuration, so no environment variables are required. If you wish, you can export them explicitly:
-
-```bash
-export JDBC_URL=jdbc:postgresql://localhost:5432/customer_service_app
-export DB_USERNAME=postgres
-export DB_PASSWORD=postgres
-```
-
-## Run the application
-
+2) Run the app
 ```bash
 ./gradlew bootRun
 ```
+What happens on startup:
+- Flyway applies migrations (creates `products` table with JSONB `variants`)
+- Scheduled importer runs immediately (initialDelay=0) and tries to import up to 50 products
+- If still empty, a small DataSeeder inserts a sample row to prove the UI works
 
-On startup, Flyway will create the schema and a scheduled job will attempt to import up to 50 products from https://famme.no/products.json. To ensure the UI always has something to show, a tiny DataSeeder inserts a sample product if the table is empty.
+3) Open the UI
+- http://localhost:8080
+- Click “Refresh” (or it may auto-load) to populate the products table
 
-Open the UI in your browser:
-- http://localhost:8080/
-- Click the "Load products" button to load the products table via HTMX without a full page refresh.
+## Development: hot reload
+Spring Boot DevTools is enabled to avoid manual restarts.
 
-## Hot reloading (no manual restarts)
-This project ships with Spring Boot DevTools for fast reloads during development.
+Enable in IntelliJ:
+- Preferences → Build, Execution, Deployment → Compiler → check “Build project automatically”
+- Preferences → Advanced Settings → check “Allow auto-make to start even if developed application is currently running”
 
-What you get:
-- Automatic restart of the application when Kotlin/Java classes or resources on the classpath change
-- A built-in LiveReload server that can refresh the browser when templates/static files change
-
-How to use:
-1. Run the app in development mode (the default):
-   ```bash
-   ./gradlew bootRun
-   ```
-2. In IntelliJ IDEA, enable automatic compilation so changes are picked up immediately:
-   - macOS: Preferences → Build, Execution, Deployment → Compiler → check "Build project automatically"
-   - Then go to Preferences → Advanced Settings → check "Allow auto-make to start even if developed application is currently running"
-3. Optional: Install a LiveReload browser extension and enable it on http://localhost:8080 so the page refreshes automatically when you change templates or static assets. DevTools exposes the LiveReload server on port 35729.
+Then run:
+```bash
+./gradlew bootRun
+```
+DevTools will:
+- Restart the app on code/resource changes
+- Provide a LiveReload server (port 35729). Install a LiveReload extension if you want auto page refresh on template/static changes.
 
 Notes:
-- Thymeleaf caching is disabled (spring.thymeleaf.cache=false), so template changes are reflected immediately.
-- Code changes trigger a quick application restart (not a full JVM reload). Long-lived state should be avoided in dev.
-- DevTools is included as a developmentOnly dependency; it is not packaged into production builds.
+- Template cache is disabled: `spring.thymeleaf.cache=false`
+- Virtual threads enabled: `spring.threads.virtual.enabled=true`
+- Build config: Java toolchain 25; Kotlin/Java emit target 22 to avoid mismatch
 
-## Test using IntelliJ HTTP Client
-There’s a prebuilt HTTP requests file at `http/requests.http`. In IntelliJ, open this file and run:
+## Environment variables
+These are optional (defaults match docker-compose):
+- `JDBC_URL` (default: `jdbc:postgresql://localhost:5432/customer_service_app`)
+- `DB_USERNAME` (default: `postgres`)
+- `DB_PASSWORD` (default: `postgres`)
 
-```
-GET http://localhost:8080/
-GET http://localhost:8080/products
-```
+## Project layout
+- `src/main/resources/db/migration/V1__init.sql` — Flyway migration (products table + indexes)
+- `src/main/kotlin/.../products/ProductRepository.kt` — JdbcClient queries (list, search, insert, update, delete, upsert by external_id)
+- `src/main/kotlin/.../products/ProductImportScheduler.kt` — scheduled importer (limit 50, variants JSONB)
+- `src/main/kotlin/.../web/HomeController.kt` — MVC endpoints
+- `src/main/resources/templates/` — Thymeleaf templates (index, fragments/products-table, search, product-edit)
+- `src/main/resources/static/css/app.css` — small site styling layer using Web Awesome tokens
+- `docker-compose.yml` — Postgres 16 local DB
+- `http/requests.http` — IntelliJ HTTP client examples
 
-## Inspect the database in IntelliJ
-- Open the Database tool window, add a PostgreSQL data source:
-  - Host: localhost
-  - Port: 5432
-  - Database: customer_service_app
-  - User: postgres
-  - Password: postgres
-- Run queries like:
+## Endpoints (human-facing)
+- `GET /` — products page; HTMX loads table via `GET /products`
+- `GET /products` — table fragment of latest products (limited)
+- `POST /products/add` — add a product; returns updated table fragment
+- `GET /search` — search page (live as you type)
+- `GET /products/search?q=...` — table fragment filtered by title
+- `GET /products/{id}/edit` — edit form
+- `POST /products/{id}/edit` — update product then redirect
+- `POST /products/{id}/delete` — delete product; returns updated table fragment
 
-```sql
-select count(*) from products;
-select id, title, price, url from products order by id desc limit 10;
-```
+## Database schema (summary)
+Table: `products`
+- `id bigserial primary key`
+- `external_id text unique` — used by importer for upsert
+- `title text not null`
+- `price numeric(12,2)`
+- `url text`
+- `variants jsonb` — raw variants array from upstream
+- `created_at timestamptz default now()`, `updated_at timestamptz`
+Indexes:
+- GIN on `to_tsvector('simple', coalesce(title,''))` for search
+- GIN on `variants`
 
-## Run integration test (optional)
-A Testcontainers integration test is included, gated behind an env var to avoid requiring Docker on every test run:
+## Search
+Live, debounced search by title is available at `/search`. As you type, HTMX requests `/products/search?q=...` and swaps the table fragment.
 
+## Testing
+- Unit/integration: JUnit 5. Optional Postgres integration via Testcontainers.
+- To run the gated integration test:
 ```bash
 export ENABLE_DOCKER_TESTS=true
 ./gradlew test --tests "*ProductRepositoryIT*"
 ```
+- HTTP requests: open `http/requests.http` in IntelliJ and run the requests.
 
 ## Troubleshooting
-- Port conflict on 5432: Change the compose mapping to `15432:5432` and set `JDBC_URL=jdbc:postgresql://localhost:15432/customer_service_app`.
-- Importer errors: The app logs failures but continues to run; try reloading later or check logs. You can still view the UI and the seeded sample product.
-- Reset DB: `docker compose down -v && docker compose up -d`
-
-## Tech summary
-- Spring Boot 3.5.6, Kotlin 2.0.21, Java 21 toolchain
-- Flyway migrations under `src/main/resources/db/migration`
-- Postgres 16 (via Docker Compose)
-- HTMX + Thymeleaf for server-rendered UI
-- Web Awesome for components + design tokens
-
-## Why do we import /css/app.css if Web Awesome docs don’t mention it?
-Web Awesome provides the design system (tokens, themes, components). Our `app.css` is a tiny, site-specific layer where we:
-- Apply layout primitives (container width, card spacing) using Web Awesome tokens
-- Polish the table (sticky header, zebra striping, hover) and form spacing
-- Add small UX niceties (skeleton placeholder, button loading spinner)
-
-It’s optional. If you want to rely only on Web Awesome defaults, delete the line in `templates/index.html`:
-
-```html
-<link rel="stylesheet" href="/css/app.css?v=2">
+- Postgres port busy: change docker-compose mapping to `15432:5432` and set `JDBC_URL=jdbc:postgresql://localhost:15432/customer_service_app`.
+- Importer errors: app continues to run; check logs and retry later. You can manually insert a product:
+```sql
+insert into products (title, price, url) values ('Local Test Product', 9.99, 'https://example.com');
 ```
+- DevTools not reloading: ensure IntelliJ auto-make is enabled and code compiles on save.
+- Template/CSS cache: we version the stylesheet link (`/css/app.css?v=3`); hard-refresh if styles seem stale.
 
-The UI will still work with Web Awesome’s default theme, but you’ll lose our custom spacing and table polish. You can also trim `app.css` to only keep what you like.
+## Why keep app.css in addition to Web Awesome?
+Web Awesome provides components and tokens. `app.css` applies page layout (header, containers), table polish (sticky header, zebra rows), form spacing, and small UX details (skeletons, button spinners) using those tokens. You can trim or remove it if you prefer pure defaults.
+
+---
+Happy hacking! Open an issue if you spot something off or want to propose improvements.

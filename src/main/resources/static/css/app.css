@@ -1,5 +1,3 @@
-/* Premium UI/UX inspired by Airbnb design system */
-
 /* Import Google Fonts for better typography */
 @import url('https://fonts.googleapis.com/css2?family=Cereal:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -106,7 +104,42 @@ body {
 .top-actions {
     display: flex;
     align-items: center;
+    gap: 0.75rem;
+}
+
+/* Enhanced header link styling */
+.gh-link {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 200ms ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.gh-link:hover {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    color: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.gh-link wa-icon {
+    width: 1rem;
+    height: 1rem;
+    color: currentColor;
+}
+
+.gh-link span {
+    font-family: 'Inter', sans-serif;
 }
 
 /* Modern container with better spacing */
@@ -484,7 +517,46 @@ body {
     font-weight: 500;
 }
 
-/* Layout for improved UX: main content + sticky aside */
+/* Enhanced utility classes */
+.mt {
+    margin-top: 3rem;
+}
+
+/* Add some premium touches */
+@media (prefers-reduced-motion: no-preference) {
+    * {
+        scroll-behavior: smooth;
+    }
+}
+
+/* Better focus states for accessibility */
+*:focus-visible {
+    outline: 2px solid #222222;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+}
+
+.hidden-mobile {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .hidden-mobile {
+        display: block;
+    }
+}
+
+.mobile-only {
+    display: block;
+}
+
+@media (min-width: 768px) {
+    .mobile-only {
+        display: none;
+    }
+}
+
+/* Layout for improved UX: main content + compact aside */
 .layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -493,7 +565,7 @@ body {
 
 @media (min-width: 1024px) {
     .layout {
-        grid-template-columns: minmax(0, 1fr) 360px;
+        grid-template-columns: minmax(0, 1fr) clamp(350px, 28vw, 420px);
         align-items: start;
     }
 }
@@ -531,70 +603,279 @@ body {
     z-index: 2;
 }
 
-/* Enhanced utility classes */
-.mt {
-    margin-top: 3rem;
-}
-
-/* Elegant product form using Web Awesome tokens */
+/* Clean, minimal product form matching table design */
 .product-form.modern {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1.25rem 1.25rem 1rem;
+    grid-auto-flow: row;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    max-width: 100%;
+    margin: 0;
+    background: #ffffff;
+    border-radius: 0;
+    position: relative;
 }
 
-.product-form .field {
+/* Enhanced field styling with premium focus states */
+.product-form.modern > * {
+    grid-column: 1 / -1;
     width: 100%;
+    min-width: 0;
 }
 
-.product-form .suffix {
+.product-form.modern wa-field,
+.product-form.modern .field {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    position: relative;
+}
+
+/* Field labels with consistent styling */
+.product-form.modern wa-field [slot="label"],
+.product-form.modern .field label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Clean input styling matching table design */
+.product-form.modern wa-input {
+    width: 100%;
+    min-width: 0;
+    border-radius: 0.5rem;
+    border: 1.5px solid #d1d5db;
+    background: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 0.75rem 1rem;
+    transition: all 200ms ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.product-form.modern wa-input:hover {
+    border-color: #9ca3af;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.product-form.modern wa-input:focus {
+    border-color: #374151;
+    box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    outline: none;
+}
+
+/* Input prefix icons with muted colors */
+.product-form.modern wa-input [slot="prefix"] {
+    color: #6b7280;
+    transition: color 200ms ease;
+}
+
+.product-form.modern wa-input:focus [slot="prefix"] {
+    color: #374151;
+}
+
+/* Currency suffix styling */
+.product-form.modern .suffix {
     color: #6b7280;
     font-weight: 600;
     letter-spacing: 0.02em;
+    font-size: 0.95rem;
 }
 
-.product-form .req {
+/* Help text with better spacing */
+.product-form.modern [slot="help-text"],
+.product-form.modern .help-text {
+    display: block;
+    margin-top: 0.5rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Required indicator */
+.product-form.modern .req {
     color: #ef4444;
+    font-weight: 700;
 }
 
-.product-form .form-actions {
+/* Compact form actions */
+.product-form.modern .form-actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding-top: 0.5rem;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    margin-top: 0;
 }
 
-/* Add some premium touches */
-@media (prefers-reduced-motion: no-preference) {
-    * {
-        scroll-behavior: smooth;
+/* Clean button styling matching table theme */
+.product-form.modern wa-button[color="brand"] {
+    background: #374151;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 200ms ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.product-form.modern wa-button[color="brand"]:hover {
+    background: #1f2937;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.product-form.modern wa-button[variant="text"] {
+    color: #6b7280;
+    border: none;
+    background: transparent;
+    font-weight: 500;
+    transition: all 200ms ease;
+}
+
+.product-form.modern wa-button[variant="text"]:hover {
+    color: #374151;
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* Loading indicator enhancement */
+.btn-indicator {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.5rem;
+    border: 2px solid rgba(255,255,255,0.6);
+    border-top-color: rgba(255,255,255,1);
+    border-radius: 999px;
+    animation: spin 800ms linear infinite;
+}
+
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator { display: inline-block; }
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Help text at bottom of form */
+.product-form + .help {
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.25rem 2.5rem 0;
+    text-align: center;
+}
+
+/* Responsive enhancements for modern, balanced layout */
+.main { grid-area: main; }
+.aside { grid-area: aside; }
+
+/* Mobile-first: show the form (aside) before the list (main) to avoid long scrolls */
+@media (max-width: 1023.98px) {
+    .layout {
+        grid-template-areas:
+      "aside"
+      "main";
     }
-}
 
-/* Better focus states for accessibility */
-*:focus-visible {
-    outline: 2px solid #222222;
-    outline-offset: 2px;
-    border-radius: 0.375rem;
-}
-
-.hidden-mobile {
-    display: none;
-}
-
-@media (min-width: 768px) {
-    .hidden-mobile {
-        display: block;
+    /* Compact header and cards on small screens */
+    .site-header-inner {
+        padding: 0 1rem;
+        height: 4.25rem;
     }
-}
 
-.mobile-only {
-    display: block;
-}
+    /* Make header links more compact on mobile */
+    .top-actions {
+        gap: 0.5rem;
+    }
 
-@media (min-width: 768px) {
-    .mobile-only {
+    .gh-link {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .gh-link span {
         display: none;
+    }
+
+    .gh-link wa-icon {
+        width: 1.125rem;
+        height: 1.125rem;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    /* Keep the aside non-sticky on small screens */
+    .aside-sticky {
+        position: static;
+        top: auto;
+    }
+
+    /* Compact form on mobile */
+    .product-form.modern {
+        gap: 1.25rem;
+        padding: 1.25rem;
+    }
+
+    .product-form .form-actions {
+        flex-wrap: wrap;
+    }
+
+    /* Larger products list scroll height on mobile */
+    .scroll-area {
+        max-height: 60vh;
+    }
+}
+
+/* Larger screens: keep two columns with more space for table */
+@media (min-width: 1024px) {
+    .layout {
+        grid-template-areas: "main aside";
+    }
+
+    .aside-sticky {
+        position: sticky;
+        top: 6rem;
+    }
+
+    .scroll-area {
+        max-height: 75vh;
+    }
+}
+
+/* Prevent long words/URLs from breaking layout */
+.card, .product-form, #products-table {
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Better alignment for header actions on narrow screens */
+.actions wa-button {
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .actions wa-button {
+        width: auto;
     }
 }
