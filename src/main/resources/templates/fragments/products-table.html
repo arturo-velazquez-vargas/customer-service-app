@@ -2,34 +2,61 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="table">
-    <table class="products">
+    <div class="table-meta">
+        <div class="meta-left">
+            <wa-icon name="grid" class="mr-1" aria-hidden="true"></wa-icon>
+            <span class="muted">Products:</span>
+            <span class="pill" th:text="${#lists.size(products)}">0</span>
+        </div>
+        <div class="meta-actions">
+            <a class="link" hx-get="/products" hx-target="#products-table" hx-swap="innerHTML">
+                <wa-icon name="refresh-cw" class="mr-1" aria-hidden="true"></wa-icon>
+                Refresh
+            </a>
+        </div>
+    </div>
+    <table class="products modern" role="grid">
         <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>URL</th>
+        <tr role="row">
+            <th scope="col">ID</th><th scope="col">Title</th><th scope="col">Price</th><th scope="col">URL</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:if="${#lists.isEmpty(products)}">
-            <td colspan="4" class="empty">No products yet. Add one using the form below or load from source.</td>
-        </tr>
-        <tr th:each="p : ${products}">
-            <td th:text="${p.id}"></td>
-            <td>
-                <div class="title">
-                    <span th:text="${p.title}"></span>
+        <tr th:if="${#lists.isEmpty(products)}" class="empty-row">
+            <td colspan="4" class="empty">
+                <div class="empty-state">
+                    <wa-icon name="package" class="empty-icon" aria-hidden="true"></wa-icon>
+                    <div>
+                        <strong>No products yet</strong>
+                        <div class="muted">Use Refresh to load products or add one using the form.</div>
+                    </div>
                 </div>
             </td>
-            <td th:text="${p.price} ?: '—'"></td>
+        </tr>
+
+        <tr th:each="p : ${products}">
+            <td class="mono" th:text="${p.id}"></td>
+            <td><span class="truncate" th:text="${p.title}"></span></td>
             <td>
-                <a th:if="${p.url}" th:href="${p.url}" target="_blank">link</a>
+                <wa-badge th:if="${p.price != null}"
+                          color="neutral" variant="soft" size="small"
+                          th:text="${'kr ' + #numbers.formatDecimal(p.price, 1, 'COMMA', 2, 'POINT')}"></wa-badge>
+                <span th:if="${p.price == null}">—</span>
+            </td>
+            <td>
+                <wa-button th:if="${p.url}"
+                           href="" th:attr="href=${p.url}"
+                           target="_blank" rel="noreferrer noopener"
+                           variant="text" size="small">
+                    <wa-icon slot="prefix" name="external-link"></wa-icon>
+                    Open
+                </wa-button>
                 <span th:if="${p.url == null}">—</span>
             </td>
         </tr>
         </tbody>
     </table>
 </div>
+
 </body>
 </html>

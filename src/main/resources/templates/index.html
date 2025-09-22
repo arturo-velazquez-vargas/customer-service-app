@@ -1,70 +1,155 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title th:text="${appName}">Customer Service App</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAMME - Premium Athletic Wear</title>
+    <meta name="description" content="Discover premium athletic wear and activewear designed for performance and style. Shop leggings, sports bras, and more." />
+    <meta name="author" content="FAMME" />
+    <meta name="keywords" content="athletic wear, activewear, leggings, sports bras, yoga pants, fitness clothing" />
 
-    <!-- Web Awesome (Icons & components) -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@webawesome/components@latest/dist/webawesome-components/webawesome-components.esm.js"></script>
-    <script nomodule src="https://cdn.jsdelivr.net/npm/@webawesome/components@latest/dist/webawesome-components/webawesome-components.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@webawesome/theme@latest/dist/theme.css"/>
-
-    <!-- HTMX -->
+    <!-- Web Awesome v3 beta: single stylesheet + loader (includes tokens & icons) -->
+    <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/styles/webawesome.css" />
+    <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/webawesome.loader.js"></script>
+    <!-- HTMX for partial updates -->
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 
-    <link rel="stylesheet" href="/css/app.css"/>
+    <meta property="og:title" content="FAMME - Premium Athletic Wear" />
+    <meta property="og:description" content="Discover premium athletic wear and activewear designed for performance and style." />
+    <meta property="og:type" content="website" />
+
+    <link rel="stylesheet" href="/css/app.css?v=2">
+
 </head>
+
 <body>
 <header class="site-header">
-    <h1>Customer Service App</h1>
+    <div class="site-header-inner">
+        <div class="brand">
+            <wa-icon name="layers" class="brand-icon" aria-hidden="true"></wa-icon>
+            <div class="brand-text">
+                <h1 class="app-title" th:text="${appName}">Customer Service App</h1>
+                <p class="app-subtitle">Kotlin • Spring Boot • HTMX • Postgres</p>
+            </div>
+        </div>
+        <nav class="top-actions">
+            <a class="gh-link" href="https://webawesome.com/docs/" target="_blank" rel="noreferrer noopener">
+                <wa-icon name="book-open"></wa-icon>
+                <span>Web Awesome Docs</span>
+            </a>
+        </nav>
+    </div>
 </header>
 <main class="container">
-    <section class="card">
-        <div class="card-header">
-            <h2>Products</h2>
-            <div class="actions">
-                <wa-button color="primary"
-                           hx-get="/products"
-                           hx-target="#products-table"
-                           hx-swap="innerHTML">
-                    Load products
-                </wa-button>
+    <div class="layout">
+      <section class="card main">
+          <div class="card-header">
+              <div class="header-left">
+                  <wa-icon name="box" class="section-icon" aria-hidden="true"></wa-icon>
+                  <h2>Products</h2>
+              </div>
+              <div class="actions">
+                  <wa-button color="primary" id="load-products-btn">
+                      <wa-icon slot="prefix" name="refresh-cw"></wa-icon>
+                      Refresh
+                      <span id="load-indicator" class="htmx-indicator btn-indicator" aria-hidden="true"></span>
+                  </wa-button>
+              </div>
+          </div>
+          <!-- Persistent scroll container to keep page from scrolling -->
+          <div class="scroll-area" role="region" aria-label="Products list">
+            <div id="products-table"
+                 aria-live="polite" aria-busy="false"
+                 hx-get="/products" hx-trigger="load, click from:#load-products-btn"
+                 hx-swap="innerHTML" hx-indicator="#load-indicator">
+                <!-- Table will load here via HTMX on page load; placeholder shows meanwhile -->
+                <div class="placeholder">
+                    <div class="skeleton-row"></div>
+                    <div class="skeleton-row"></div>
+                    <div class="skeleton-row"></div>
+                </div>
             </div>
-        </div>
-        <div id="products-table" class="table-wrapper">
-            <!-- Table will load here via HTMX -->
-        </div>
-    </section>
+          </div>
+      </section>
 
-    <section class="card mt">
-        <div class="card-header">
-            <h2>Add a new product</h2>
+      <aside class="aside">
+        <div class="aside-sticky">
+          <section class="card">
+              <div class="card-header">
+                  <div class="header-left">
+                      <wa-icon name="plus-circle" class="section-icon" aria-hidden="true"></wa-icon>
+                      <h2>Add a new product</h2>
+                  </div>
+              </div>
+              <form class="product-form modern"
+                    hx-post="/products/add"
+                    hx-target="#products-table"
+                    hx-swap="innerHTML"
+                    hx-vals='{"_csrf": ""}'
+                    hx-on="htmx:afterRequest: this.reset()">
+                  <!-- Title -->
+                  <wa-field class="field" size="large">
+                    <span slot="label">Title <span class="req" aria-hidden="true">*</span></span>
+                    <wa-input id="title" name="title" required placeholder="Product title" clearable>
+                      <wa-icon slot="prefix" name="type"></wa-icon>
+                    </wa-input>
+                    <span slot="help-text">A short, descriptive name that customers will recognize.</span>
+                  </wa-field>
+
+                  <!-- Price -->
+                  <wa-field class="field" size="large">
+                    <span slot="label">Price</span>
+                    <wa-input id="price" name="price" type="number" step="0.01" min="0" placeholder="e.g. 19.99">
+                      <wa-icon slot="prefix" name="banknote"></wa-icon>
+                      <span slot="suffix" class="suffix">NOK</span>
+                    </wa-input>
+                    <span slot="help-text">Optional. Leave empty if price isn’t known yet.</span>
+                  </wa-field>
+
+                  <!-- URL -->
+                  <wa-field class="field" size="large">
+                    <span slot="label">URL</span>
+                    <wa-input id="url" name="url" type="url" placeholder="https://example.com/product" clearable>
+                      <wa-icon slot="prefix" name="link-2"></wa-icon>
+                    </wa-input>
+                    <span slot="help-text">Optional product page link. Opens in a new tab from the table.</span>
+                  </wa-field>
+
+                  <div class="form-actions">
+                    <wa-button color="brand" variant="solid" size="large" type="submit">
+                      <wa-icon slot="prefix" name="plus"></wa-icon>
+                      Add product
+                    </wa-button>
+                    <wa-button variant="text" type="reset">
+                      <wa-icon slot="prefix" name="rotate-ccw"></wa-icon>
+                      Reset
+                    </wa-button>
+                  </div>
+              </form>
+              <p class="help">Submitting the form updates the products table on the left without a full page reload.</p>
+          </section>
         </div>
-        <form class="product-form"
-              hx-post="/products/add"
-              hx-target="#products-table"
-              hx-swap="innerHTML"
-              hx-vals='{"_csrf": ""}'
-              hx-on="htmx:afterRequest: this.reset()">
-            <div class="form-row">
-                <label for="title">Title <span class="req">*</span></label>
-                <input id="title" name="title" type="text" placeholder="Product title" required />
-            </div>
-            <div class="form-row">
-                <label for="price">Price</label>
-                <input id="price" name="price" type="number" step="0.01" min="0" placeholder="e.g. 19.99" />
-            </div>
-            <div class="form-row">
-                <label for="url">URL</label>
-                <input id="url" name="url" type="url" placeholder="https://example.com/product" />
-            </div>
-            <div class="form-actions">
-                <wa-button color="success" type="submit">Add product</wa-button>
-            </div>
-        </form>
-        <p class="help">Submitting the form will update the products table above without reloading the page.</p>
-    </section>
+      </aside>
+    </div>
 </main>
+<script>
+  // Density toggle: persists in localStorage
+  (function(){
+    const compactBtn = document.getElementById('density-compact');
+    const comfyBtn = document.getElementById('density-comfortable');
+    const apply = (mode) => {
+      if (mode === 'compact') {
+        document.body.classList.add('density-compact');
+      } else {
+        document.body.classList.remove('density-compact');
+      }
+      localStorage.setItem('density-mode', mode);
+    };
+    const saved = localStorage.getItem('density-mode');
+    if (saved) apply(saved);
+    compactBtn?.addEventListener('click', () => apply('compact'));
+    comfyBtn?.addEventListener('click', () => apply('comfortable'));
+  })();
+</script>
 </body>
 </html>

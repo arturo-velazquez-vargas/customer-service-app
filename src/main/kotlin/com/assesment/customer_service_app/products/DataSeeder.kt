@@ -24,7 +24,6 @@ class DataSeeder(private val repo: ProductRepository) {
                 log.debug("Skipping seed; products table already has data")
             }
         } catch (e: Exception) {
-            // Don't fail the app if seeding encounters an error
             log.warn("Data seeding skipped due to error: ${e.message}")
         }
     }
