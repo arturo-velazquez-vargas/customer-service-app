@@ -19,7 +19,23 @@ class HomeController(private val repo: ProductRepository) {
 
     @GetMapping("/products")
     fun products(model: Model): String {
-        model.addAttribute("products", repo.findAll(100))
+        model.addAttribute("products", repo.findAll(50))
+        return "fragments/products-table :: table"
+    }
+
+    @GetMapping("/search")
+    fun searchPage(model: Model): String {
+        model.addAttribute("appName", "Customer Service App")
+        // Start with empty results; HTMX will populate as user types
+        model.addAttribute("products", emptyList<Any>())
+        return "search"
+    }
+
+    @GetMapping("/products/search")
+    fun searchProducts(@RequestParam(name = "q", required = false, defaultValue = "") q: String, model: Model): String {
+        val query = q.trim()
+        val results = if (query.isBlank()) emptyList() else repo.searchByTitle(query, 50)
+        model.addAttribute("products", results)
         return "fragments/products-table :: table"
     }
 
@@ -32,7 +48,7 @@ class HomeController(private val repo: ProductRepository) {
     ): String {
         val priceValue: BigDecimal? = price?.trim()?.takeIf { it.isNotEmpty() }?.let { runCatching { BigDecimal(it) }.getOrNull() }
         repo.insertManual(title = title.trim(), price = priceValue, url = url?.trim()?.takeIf { it.isNotEmpty() })
-        model.addAttribute("products", repo.findAll(100))
+        model.addAttribute("products", repo.findAll(50))
         return "fragments/products-table :: table"
     }
 }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Products • Customer Service App</title>
+
+  <!-- Web Awesome -->
+  <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/styles/webawesome.css" />
+  <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/webawesome.loader.js"></script>
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+  <link rel="stylesheet" href="/css/app.css?v=2">
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <wa-icon name="search" class="brand-icon" aria-hidden="true"></wa-icon>
+      <div class="brand-text">
+        <h1 class="app-title">Search</h1>
+        <p class="app-subtitle">Find products by title — results update as you type</p>
+      </div>
+    </div>
+    <nav class="top-actions">
+      <a class="gh-link" href="/" rel="noreferrer">
+        <wa-icon name="home"></wa-icon>
+        <span>Home</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card main">
+    <div class="card-header">
+      <div class="header-left">
+        <wa-icon name="zoom-in" class="section-icon" aria-hidden="true"></wa-icon>
+        <h2>Search Products</h2>
+      </div>
+    </div>
+    <div style="padding: 1rem 1.25rem 0.5rem;">
+      <form id="search-form"
+            hx-get="/products/search"
+            hx-target="#search-results"
+            hx-swap="innerHTML"
+            hx-trigger="input changed delay:300ms from:#q, search">
+        <div class="search-box" style="display:flex; align-items:center; gap:.5rem; border:1px solid #e5e7eb; border-radius:.75rem; padding:.5rem .75rem; background:#fff;">
+          <wa-icon name="search" aria-hidden="true" style="color:#6b7280;"></wa-icon>
+          <input id="q" name="q" type="search" placeholder="Search products by title..." autocomplete="off" style="flex:1; border:none; outline:none; font-size:1rem; padding:.5rem; background:transparent;" />
+          <wa-button type="button" variant="text" onclick="document.getElementById('q').value=''; htmx.trigger('#search-form','submit')">
+            <wa-icon name="x"></wa-icon>
+            Clear
+          </wa-button>
+        </div>
+      </form>
+    </div>
+
+    <div class="scroll-area" role="region" aria-label="Search results" style="margin-top:.25rem;">
+      <div id="search-results" aria-live="polite">
+        <div class="placeholder" style="padding:1rem 1.25rem; color:#6b7280;">
+          Start typing to search by title. Results will appear here.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
