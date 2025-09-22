@@ -1,0 +1,7 @@
+### Health and products endpoints (use IntelliJ HTTP Client)
+
+GET http://localhost:8080/
+
+### Load products fragment
+GET http://localhost:8080/products
+
