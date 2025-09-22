@@ -1,6 +1,6 @@
 package com.assesment.customer_service_app.web
 
-import com.assesment.customer_service_app.products.ProductRepository
+import com.assesment.customer_service_app.product.infrastructure.ProductRepository
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*

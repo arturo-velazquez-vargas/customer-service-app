@@ -1,5 +1,6 @@
 package com.assesment.customer_service_app.products
 
+import com.assesment.customer_service_app.product.infrastructure.ProductRepository
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

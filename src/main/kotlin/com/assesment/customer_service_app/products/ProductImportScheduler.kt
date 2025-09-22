@@ -1,5 +1,7 @@
-package com.assesment.customer_service_app.products
+package com.assesment.customer_service_app.product.application
 
+import com.assesment.customer_service_app.product.domain.Product
+import com.assesment.customer_service_app.product.infrastructure.ProductRepository
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -7,7 +9,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
-import java.math.BigDecimal
 
 @Component
 class ProductImportScheduler(

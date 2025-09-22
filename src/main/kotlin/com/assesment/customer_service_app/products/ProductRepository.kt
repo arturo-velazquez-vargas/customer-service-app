@@ -1,5 +1,6 @@
-package com.assesment.customer_service_app.products
+package com.assesment.customer_service_app.product.infrastructure
 
+import com.assesment.customer_service_app.product.domain.Product
 import org.springframework.jdbc.core.simple.JdbcClient
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal

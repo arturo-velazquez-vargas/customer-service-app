@@ -44,7 +44,7 @@ What happens on startup:
 - If still empty, a small DataSeeder inserts a sample row to prove the UI works
 
 3) Open the UI
-- http://localhost:8081
+- http://localhost:8082
 - Click “Refresh” (or it may auto-load) to populate the products table
 
 ## Development: hot reload
