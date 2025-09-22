@@ -74,4 +74,11 @@ class HomeController(private val repo: ProductRepository) {
         repo.updateProduct(id, cleanTitle, priceValue, cleanUrl)
         return "redirect:/"
     }
+
+    @PostMapping("/products/{id}/delete")
+    fun deleteProduct(@PathVariable id: Long, model: Model): String {
+        repo.deleteById(id)
+        model.addAttribute("products", repo.findAll(50))
+        return "fragments/products-table :: table"
+    }
 }

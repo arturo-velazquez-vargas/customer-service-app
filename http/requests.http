@@ -26,3 +26,6 @@ Content-Type: application/x-www-form-urlencoded
 
 title=Updated%20Title&price=49.99&url=https%3A%2F%2Fexample.com%2Fupdated
 
+### Delete a product (replace {id})
+POST http://localhost:8080/products/1/delete
+

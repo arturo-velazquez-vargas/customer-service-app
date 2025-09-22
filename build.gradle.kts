@@ -11,16 +11,37 @@ description = "Customer service app (Kotlin, Spring Boot, HTMX, Postgres)"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
+}
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    // Kotlin 2.0.x can't emit class files for Java 25 yet; target 22 to match Java (see JavaCompile below)
+    compilerOptions {
+        freeCompilerArgs.add("-Xjsr305=strict")
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22)
+    }
+}
+
+// Use JDK 25 toolchain to compile, but emit Java 22 bytecode for compatibility with Kotlin target
+// This sets --release=22 so compileJava doesn't produce class files at 25 while Kotlin is at 22
+tasks.withType<org.gradle.api.tasks.compile.JavaCompile>().configureEach {
+    options.release.set(22)
 }
 
 repositories {
     mavenCentral()
+}
+
+// Ensure devtools is available on the runtime classpath during development
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom(configurations.developmentOnly.get())
+    }
 }
 
 dependencies {
