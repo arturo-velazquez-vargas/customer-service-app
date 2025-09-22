@@ -5,3 +5,9 @@ GET http://localhost:8080/
 ### Load products fragment
 GET http://localhost:8080/products
 
+### Add a new product (updates the table via HTMX when used from the UI; here we call the endpoint directly)
+POST http://localhost:8080/products/add
+Content-Type: application/x-www-form-urlencoded
+
+title=HTMX%20Test%20Product&price=12.34&url=https%3A%2F%2Fexample.com%2Fhtmx-test
+

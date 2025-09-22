@@ -1,9 +1,13 @@
 :root {
   /* Web Awesome design tokens (example usage of CSS vars) */
   --wa-color-primary: var(--wa-color-blue-600, #2563eb);
+  --wa-color-surface: var(--wa-color-white, #ffffff);
+  --wa-color-border: var(--wa-color-gray-200, #e5e7eb);
+  --wa-color-muted: var(--wa-color-gray-600, #475569);
   --wa-spacing-1: var(--wa-space-2, 0.5rem);
   --wa-spacing-2: var(--wa-space-3, 0.75rem);
   --wa-spacing-3: var(--wa-space-4, 1rem);
+  --wa-spacing-4: var(--wa-space-6, 1.5rem);
   --wa-radius: var(--wa-radius-md, 8px);
 }
 
@@ -26,16 +30,24 @@ body {
   padding: var(--wa-spacing-3);
 }
 
-.actions {
-  margin: var(--wa-spacing-3) 0;
-}
-
-.table-wrapper {
-  background: white;
+.card {
+  background: var(--wa-color-surface);
   border-radius: var(--wa-radius);
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   overflow: hidden;
 }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--wa-spacing-3) var(--wa-spacing-3);
+  border-bottom: 1px solid var(--wa-color-border);
+}
+
+.mt { margin-top: var(--wa-spacing-4); }
+
+.table-wrapper { overflow-x: auto; }
 
 table.products {
   width: 100%;
@@ -45,9 +57,42 @@ table.products {
 table.products th, table.products td {
   text-align: left;
   padding: var(--wa-spacing-2);
-  border-bottom: 1px solid var(--wa-color-gray-200, #e5e7eb);
+  border-bottom: 1px solid var(--wa-color-border);
 }
 
 table.products thead {
   background: var(--wa-color-gray-100, #f3f4f6);
+}
+
+table.products td.empty {
+  text-align: center;
+  color: var(--wa-color-muted);
+}
+
+.product-form {
+  padding: var(--wa-spacing-3);
+}
+
+.product-form .form-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: var(--wa-spacing-2);
+  align-items: center;
+  margin-bottom: var(--wa-spacing-2);
+}
+
+.product-form label { color: var(--wa-color-muted); }
+
+.product-form .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--wa-spacing-2);
+  border-top: 1px solid var(--wa-color-border);
+}
+
+.req { color: var(--wa-color-red-600, #dc2626); }
+
+.help {
+  color: var(--wa-color-muted);
+  margin: 0 var(--wa-spacing-3) var(--wa-spacing-3);
 }

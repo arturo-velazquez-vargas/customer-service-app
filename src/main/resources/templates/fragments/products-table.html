@@ -12,12 +12,20 @@
         </tr>
         </thead>
         <tbody>
+        <tr th:if="${#lists.isEmpty(products)}">
+            <td colspan="4" class="empty">No products yet. Add one using the form below or load from source.</td>
+        </tr>
         <tr th:each="p : ${products}">
             <td th:text="${p.id}"></td>
-            <td th:text="${p.title}"></td>
-            <td th:text="${p.price}"></td>
+            <td>
+                <div class="title">
+                    <span th:text="${p.title}"></span>
+                </div>
+            </td>
+            <td th:text="${p.price} ?: '—'"></td>
             <td>
                 <a th:if="${p.url}" th:href="${p.url}" target="_blank">link</a>
+                <span th:if="${p.url == null}">—</span>
             </td>
         </tr>
         </tbody>
