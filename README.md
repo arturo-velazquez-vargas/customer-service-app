@@ -1,0 +1,86 @@
+# Customer Service App
+
+This project is a Kotlin + Spring Boot 3.5 app using HTMX + Thymeleaf for UI, Postgres + Flyway for the database, and a scheduled importer that pulls products from famme.no. Web Awesome is used for styling/components.
+
+This README gives you everything needed to run a local Postgres with Docker Compose, run the app, and test the UI and endpoints.
+
+## Prerequisites
+- Java 21 (project uses Java toolchain 21)
+- Docker + Docker Compose
+- IntelliJ IDEA Ultimate recommended (DB client + HTTP client)
+
+## Start Postgres with Docker Compose
+From the project root:
+
+```bash
+docker compose up -d
+# Wait until status is healthy
+docker compose ps
+```
+
+The DB will be available at:
+- URL: jdbc:postgresql://localhost:5432/customer_service_app
+- User: postgres
+- Password: postgres
+
+The application already has defaults matching this configuration, so no environment variables are required. If you wish, you can export them explicitly:
+
+```bash
+export JDBC_URL=jdbc:postgresql://localhost:5432/customer_service_app
+export DB_USERNAME=postgres
+export DB_PASSWORD=postgres
+```
+
+## Run the application
+
+```bash
+./gradlew bootRun
+```
+
+On startup, Flyway will create the schema and a scheduled job will attempt to import up to 50 products from https://famme.no/products.json. To ensure the UI always has something to show, a tiny DataSeeder inserts a sample product if the table is empty.
+
+Open the UI in your browser:
+- http://localhost:8080/
+- Click the "Load products" button to load the products table via HTMX without a full page refresh.
+
+## Test using IntelliJ HTTP Client
+There’s a prebuilt HTTP requests file at `http/requests.http`. In IntelliJ, open this file and run:
+
+```
+GET http://localhost:8080/
+GET http://localhost:8080/products
+```
+
+## Inspect the database in IntelliJ
+- Open the Database tool window, add a PostgreSQL data source:
+  - Host: localhost
+  - Port: 5432
+  - Database: customer_service_app
+  - User: postgres
+  - Password: postgres
+- Run queries like:
+
+```sql
+select count(*) from products;
+select id, title, price, url from products order by id desc limit 10;
+```
+
+## Run integration test (optional)
+A Testcontainers integration test is included, gated behind an env var to avoid requiring Docker on every test run:
+
+```bash
+export ENABLE_DOCKER_TESTS=true
+./gradlew test --tests "*ProductRepositoryIT*"
+```
+
+## Troubleshooting
+- Port conflict on 5432: Change the compose mapping to `15432:5432` and set `JDBC_URL=jdbc:postgresql://localhost:15432/customer_service_app`.
+- Importer errors: The app logs failures but continues to run; try reloading later or check logs. You can still view the UI and the seeded sample product.
+- Reset DB: `docker compose down -v && docker compose up -d`
+
+## Tech summary
+- Spring Boot 3.5.6, Kotlin 2.0.21, Java 21 toolchain
+- Flyway migrations under `src/main/resources/db/migration`
+- Postgres 16 (via Docker Compose)
+- HTMX + Thymeleaf for server-rendered UI
+- Web Awesome for components + design tokens
