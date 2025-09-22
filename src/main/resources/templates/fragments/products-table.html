@@ -54,10 +54,20 @@
                 <span th:if="${p.url == null}">—</span>
             </td>
             <td>
-                <a th:href="@{'/products/' + ${p.id} + '/edit'}" class="link">
-                    <wa-icon name="pencil" class="mr-1" aria-hidden="true"></wa-icon>
-                    Edit
-                </a>
+                <div style="display:flex; gap:.5rem; align-items:center;">
+                    <a th:href="@{'/products/' + ${p.id} + '/edit'}" class="link">
+                        <wa-icon name="pencil" class="mr-1" aria-hidden="true"></wa-icon>
+                        Edit
+                    </a>
+                    <wa-button variant="text" size="small"
+                               th:attr="hx-post=@{'/products/' + ${p.id} + '/delete'}"
+                               hx-target="#products-table"
+                               hx-swap="innerHTML"
+                               hx-confirm="Are you sure you want to delete this product? This cannot be undone.">
+                        <wa-icon slot="prefix" name="trash-2"></wa-icon>
+                        Delete
+                    </wa-button>
+                </div>
             </td>
         </tr>
         </tbody>
