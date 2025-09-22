@@ -43,6 +43,28 @@ Open the UI in your browser:
 - http://localhost:8080/
 - Click the "Load products" button to load the products table via HTMX without a full page refresh.
 
+## Hot reloading (no manual restarts)
+This project ships with Spring Boot DevTools for fast reloads during development.
+
+What you get:
+- Automatic restart of the application when Kotlin/Java classes or resources on the classpath change
+- A built-in LiveReload server that can refresh the browser when templates/static files change
+
+How to use:
+1. Run the app in development mode (the default):
+   ```bash
+   ./gradlew bootRun
+   ```
+2. In IntelliJ IDEA, enable automatic compilation so changes are picked up immediately:
+   - macOS: Preferences → Build, Execution, Deployment → Compiler → check "Build project automatically"
+   - Then go to Preferences → Advanced Settings → check "Allow auto-make to start even if developed application is currently running"
+3. Optional: Install a LiveReload browser extension and enable it on http://localhost:8080 so the page refreshes automatically when you change templates or static assets. DevTools exposes the LiveReload server on port 35729.
+
+Notes:
+- Thymeleaf caching is disabled (spring.thymeleaf.cache=false), so template changes are reflected immediately.
+- Code changes trigger a quick application restart (not a full JVM reload). Long-lived state should be avoided in dev.
+- DevTools is included as a developmentOnly dependency; it is not packaged into production builds.
+
 ## Test using IntelliJ HTTP Client
 There’s a prebuilt HTTP requests file at `http/requests.http`. In IntelliJ, open this file and run:
 
