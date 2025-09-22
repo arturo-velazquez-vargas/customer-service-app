@@ -31,10 +31,14 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("org.postgresql:postgresql")
 
     // JSON (for scheduled import)
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    // Devtools for hot reload (active only in development)
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // Testcontainers for Postgres integration tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")

@@ -31,6 +31,30 @@ class ProductRepository(private val jdbc: JdbcClient) {
             }
             .list()
 
+    fun findById(id: Long): Product? =
+        jdbc.sql(
+            """
+            select id, external_id, title, price, url, variants, created_at, updated_at
+            from products
+            where id = :id
+            """.trimIndent()
+        )
+            .param("id", id)
+            .query { rs, _ ->
+                Product(
+                    id = rs.getLong("id"),
+                    externalId = rs.getString("external_id"),
+                    title = rs.getString("title"),
+                    price = rs.getBigDecimal("price"),
+                    url = rs.getString("url"),
+                    variantsJson = rs.getString("variants"),
+                    createdAt = rs.getObject("created_at", java.time.OffsetDateTime::class.java),
+                    updatedAt = rs.getObject("updated_at", java.time.OffsetDateTime::class.java),
+                )
+            }
+            .list()
+            .firstOrNull()
+
     fun searchByTitle(query: String, limit: Int = 50): List<Product> =
         jdbc.sql(
             """
@@ -75,6 +99,23 @@ class ProductRepository(private val jdbc: JdbcClient) {
             .param("price", p.price)
             .param("url", p.url)
             .param("variantsJson", p.variantsJson)
+            .update()
+
+    fun updateProduct(id: Long, title: String, price: BigDecimal?, url: String?): Int =
+        jdbc.sql(
+            """
+            update products
+            set title = :title,
+                price = :price,
+                url = :url,
+                updated_at = now()
+            where id = :id
+            """.trimIndent()
+        )
+            .param("id", id)
+            .param("title", title)
+            .param("price", price)
+            .param("url", url)
             .update()
 
     fun insertManual(title: String, price: BigDecimal?, url: String?): Long? =

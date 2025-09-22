@@ -18,12 +18,12 @@
     <table class="products modern" role="grid">
         <thead>
         <tr role="row">
-            <th scope="col">ID</th><th scope="col">Title</th><th scope="col">Price</th><th scope="col">URL</th>
+            <th scope="col">ID</th><th scope="col">Title</th><th scope="col">Price</th><th scope="col">URL</th><th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr th:if="${#lists.isEmpty(products)}" class="empty-row">
-            <td colspan="4" class="empty">
+            <td colspan="5" class="empty">
                 <div class="empty-state">
                     <wa-icon name="package" class="empty-icon" aria-hidden="true"></wa-icon>
                     <div>
@@ -52,6 +52,12 @@
                     Open
                 </wa-button>
                 <span th:if="${p.url == null}">—</span>
+            </td>
+            <td>
+                <a th:href="@{'/products/' + ${p.id} + '/edit'}" class="link">
+                    <wa-icon name="pencil" class="mr-1" aria-hidden="true"></wa-icon>
+                    Edit
+                </a>
             </td>
         </tr>
         </tbody>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Product • Customer Service App</title>
+
+  <!-- Web Awesome -->
+  <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/styles/webawesome.css" />
+  <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-beta.6/dist/webawesome.loader.js"></script>
+  <!-- HTMX (not strictly needed here but kept for consistency) -->
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+  <link rel="stylesheet" href="/css/app.css?v=2">
+</head>
+<body>
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <wa-icon name="pencil" class="brand-icon" aria-hidden="true"></wa-icon>
+      <div class="brand-text">
+        <h1 class="app-title">Edit Product</h1>
+        <p class="app-subtitle">Update product details</p>
+      </div>
+    </div>
+    <nav class="top-actions">
+      <a class="gh-link" href="/" rel="noreferrer">
+        <wa-icon name="home"></wa-icon>
+        <span>Home</span>
+      </a>
+      <a class="gh-link" href="/search" rel="noreferrer">
+        <wa-icon name="search"></wa-icon>
+        <span>Search</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="card" style="max-width: 720px; margin: 0 auto;">
+    <div class="card-header">
+      <div class="header-left">
+        <wa-icon name="box" class="section-icon" aria-hidden="true"></wa-icon>
+        <h2>Edit Product</h2>
+      </div>
+    </div>
+
+    <div style="padding: 1rem 1.25rem 1.25rem;">
+      <form th:action="@{'/products/' + ${product.id} + '/edit'}" method="post" class="product-form modern" style="max-width: 640px;">
+        <!-- Title -->
+        <wa-field class="field" size="large">
+          <span slot="label">Title <span class="req" aria-hidden="true">*</span></span>
+          <wa-input id="title" name="title" required placeholder="Product title" clearable th:value="${product.title}">
+            <wa-icon slot="prefix" name="type"></wa-icon>
+          </wa-input>
+          <span slot="help-text">A short, descriptive name customers will recognize.</span>
+        </wa-field>
+
+        <!-- Price -->
+        <wa-field class="field" size="large">
+          <span slot="label">Price</span>
+          <wa-input id="price" name="price" type="number" step="0.01" min="0" placeholder="e.g. 19.99" th:value="${product.price}">
+            <wa-icon slot="prefix" name="banknote"></wa-icon>
+            <span slot="suffix" class="suffix">NOK</span>
+          </wa-input>
+          <span slot="help-text">Optional. Leave empty if price isn’t known yet.</span>
+        </wa-field>
+
+        <!-- URL -->
+        <wa-field class="field" size="large">
+          <span slot="label">URL</span>
+          <wa-input id="url" name="url" type="url" placeholder="https://example.com/product" clearable th:value="${product.url}">
+            <wa-icon slot="prefix" name="link-2"></wa-icon>
+          </wa-input>
+          <span slot="help-text">Optional product page link.</span>
+        </wa-field>
+
+        <div class="form-actions">
+          <wa-button color="brand" variant="solid" size="large" type="submit">
+            <wa-icon slot="prefix" name="save"></wa-icon>
+            Save changes
+          </wa-button>
+          <a href="/" class="link" style="margin-left:.25rem;">
+            <wa-icon name="arrow-left" class="mr-1" aria-hidden="true"></wa-icon>
+            Back to products
+          </a>
+        </div>
+      </form>
+
+      <div class="mt" style="color:#6b7280; font-size:.9rem;">
+        <div><strong>ID:</strong> <span class="mono" th:text="${product.id}">—</span></div>
+        <div><strong>External ID:</strong> <span class="mono" th:text="${product.externalId}">—</span></div>
+        <div><strong>Last updated:</strong> <span th:text="${product.updatedAt}">—</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
