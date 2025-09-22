@@ -15,13 +15,13 @@ class HomeController(private val repo: ProductRepository) {
         return "index"
     }
 
-    @GetMapping("/products")
+    @GetMapping(value = ["/products", "/products/"])
     fun products(model: Model): String {
         model.addAttribute("products", repo.findAll(50))
         return "fragments/products-table :: table"
     }
 
-    @GetMapping("/search")
+    @GetMapping(value = ["/search", "/search/"])
     fun searchPage(model: Model): String {
         model.addAttribute("appName", "Customer Service App")
         // Start with empty results; HTMX will populate as user types
@@ -29,7 +29,7 @@ class HomeController(private val repo: ProductRepository) {
         return "search"
     }
 
-    @GetMapping("/products/search")
+    @GetMapping(value = ["/products/search", "/products/search/"])
     fun searchProducts(@RequestParam(name = "q", required = false, defaultValue = "") q: String, model: Model): String {
         val query = q.trim()
         val results = if (query.isBlank()) emptyList() else repo.searchByTitle(query, 50)
@@ -37,7 +37,7 @@ class HomeController(private val repo: ProductRepository) {
         return "fragments/products-table :: table"
     }
 
-    @PostMapping("/products/add")
+    @PostMapping(value = ["/products/add", "/products/add/"])
     fun addProduct(
         @RequestParam title: String,
         @RequestParam(required = false) price: String?,
@@ -50,7 +50,7 @@ class HomeController(private val repo: ProductRepository) {
         return "fragments/products-table :: table"
     }
 
-    @GetMapping("/products/{id}/edit")
+    @GetMapping(value = ["/products/{id}/edit", "/products/{id}/edit/"])
     fun editProductPage(@PathVariable id: Long, model: Model): String {
         val product = repo.findById(id) ?: run {
             // If not found, redirect to home
@@ -61,7 +61,7 @@ class HomeController(private val repo: ProductRepository) {
         return "product-edit"
     }
 
-    @PostMapping("/products/{id}/edit")
+    @PostMapping(value = ["/products/{id}/edit", "/products/{id}/edit/"])
     fun updateProduct(
         @PathVariable id: Long,
         @RequestParam title: String,
@@ -75,7 +75,7 @@ class HomeController(private val repo: ProductRepository) {
         return "redirect:/"
     }
 
-    @PostMapping("/products/{id}/delete")
+    @PostMapping(value = ["/products/{id}/delete", "/products/{id}/delete/"])
     fun deleteProduct(@PathVariable id: Long, model: Model): String {
         repo.deleteById(id)
         model.addAttribute("products", repo.findAll(50))

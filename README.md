@@ -20,7 +20,7 @@ This README covers setup, development workflow (with hot reload), key features, 
 - Postgres 16 + Flyway
 - HTMX + Thymeleaf
 - Web Awesome v3 beta (components + design tokens)
-- Testcontainers (optional integration test)
+- Testcontainers (integration test)
 
 ## Quick start
 1) Start Postgres with Docker Compose
@@ -32,7 +32,7 @@ docker compose ps
 Database connection (defaults):
 - JDBC URL: `jdbc:postgresql://localhost:5432/customer_service_app`
 - User: `postgres`
-- Password: `postgres`
+- Password: `(!2KvQSnQzWg)`
 
 2) Run the app
 ```bash
@@ -44,7 +44,7 @@ What happens on startup:
 - If still empty, a small DataSeeder inserts a sample row to prove the UI works
 
 3) Open the UI
-- http://localhost:8080
+- http://localhost:8081
 - Click “Refresh” (or it may auto-load) to populate the products table
 
 ## Development: hot reload
