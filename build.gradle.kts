@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "2.0.21"
-    kotlin("plugin.spring") version "2.0.21"
+    kotlin("jvm") version "2.1.10"
+    kotlin("plugin.spring") version "2.1.10"
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -11,12 +11,12 @@ description = "Customer service app (Kotlin, Spring Boot, HTMX, Postgres)"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(25))
+        languageVersion.set(JavaLanguageVersion.of(22))
     }
 }
 
 kotlin {
-    jvmToolchain(25)
+    jvmToolchain(22)
 }
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {

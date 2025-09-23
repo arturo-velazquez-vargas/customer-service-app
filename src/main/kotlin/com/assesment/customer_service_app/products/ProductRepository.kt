@@ -32,6 +32,36 @@ class ProductRepository(private val jdbc: JdbcClient) {
             }
             .list()
 
+    fun findPaged(offset: Int, size: Int, sort: String, dir: String): List<Product> {
+        val column = when (sort.lowercase()) {
+            "id", "title", "price", "created_at", "updated_at" -> sort.lowercase()
+            else -> "id"
+        }
+        val direction = if (dir.equals("asc", true)) "asc" else "desc"
+        val sql = """
+            select id, external_id, title, price, url, variants, created_at, updated_at
+            from products
+            order by $column $direction, id desc
+            limit :limit offset :offset
+        """.trimIndent()
+        return jdbc.sql(sql)
+            .param("limit", size)
+            .param("offset", offset)
+            .query { rs, _ ->
+                Product(
+                    id = rs.getLong("id"),
+                    externalId = rs.getString("external_id"),
+                    title = rs.getString("title"),
+                    price = rs.getBigDecimal("price"),
+                    url = rs.getString("url"),
+                    variantsJson = rs.getString("variants"),
+                    createdAt = rs.getObject("created_at", java.time.OffsetDateTime::class.java),
+                    updatedAt = rs.getObject("updated_at", java.time.OffsetDateTime::class.java),
+                )
+            }
+            .list()
+    }
+
     fun findById(id: Long): Product? =
         jdbc.sql(
             """
@@ -81,6 +111,38 @@ class ProductRepository(private val jdbc: JdbcClient) {
                 )
             }
             .list()
+
+    fun searchByTitlePaged(query: String, offset: Int, size: Int, sort: String, dir: String): List<Product> {
+        val column = when (sort.lowercase()) {
+            "id", "title", "price", "created_at", "updated_at" -> sort.lowercase()
+            else -> "id"
+        }
+        val direction = if (dir.equals("asc", true)) "asc" else "desc"
+        val sql = """
+            select id, external_id, title, price, url, variants, created_at, updated_at
+            from products
+            where title ilike concat('%', :q, '%')
+            order by $column $direction, id desc
+            limit :limit offset :offset
+        """.trimIndent()
+        return jdbc.sql(sql)
+            .param("q", query)
+            .param("limit", size)
+            .param("offset", offset)
+            .query { rs, _ ->
+                Product(
+                    id = rs.getLong("id"),
+                    externalId = rs.getString("external_id"),
+                    title = rs.getString("title"),
+                    price = rs.getBigDecimal("price"),
+                    url = rs.getString("url"),
+                    variantsJson = rs.getString("variants"),
+                    createdAt = rs.getObject("created_at", java.time.OffsetDateTime::class.java),
+                    updatedAt = rs.getObject("updated_at", java.time.OffsetDateTime::class.java),
+                )
+            }
+            .list()
+    }
 
     fun upsertByExternalId(p: Product): Int =
         jdbc.sql(
