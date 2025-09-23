@@ -1,24 +1,56 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="table">
+<div th:fragment="table"
+     th:with="base=${q} != null ? '/products/search' : '/products',
+               nextDir=${dir} == 'asc' ? 'desc' : 'asc'">
     <div class="table-meta">
         <div class="meta-left">
             <wa-icon name="grid" class="mr-1" aria-hidden="true"></wa-icon>
             <span class="muted">Products:</span>
             <span class="pill" th:text="${#lists.size(products)}">0</span>
         </div>
-        <div class="meta-actions">
-            <a class="link" hx-get="/products" hx-target="#products-table" hx-swap="innerHTML">
-                <wa-icon name="refresh-cw" class="mr-1" aria-hidden="true"></wa-icon>
-                Refresh
-            </a>
+        <div class="meta-right" style="display:flex; gap:.5rem; align-items:center;">
+            <wa-button size="small" variant="text"
+                       th:classappend="${hasPrev} ? '' : 'disabled'"
+                       th:attr="hx-get=@{${base}(q=${q},page=${page - 1},size=${size},sort=${sort},dir=${dir})}"
+                       hx-target="#products-table" hx-swap="innerHTML" th:disabled="${!hasPrev}">
+                <wa-icon slot="prefix" name="chevron-left"></wa-icon>
+                Prev
+            </wa-button>
+            <span class="muted" th:text="${'Page ' + (page + 1)}">Page 1</span>
+            <wa-button size="small" variant="text"
+                       th:classappend="${hasNext} ? '' : 'disabled'"
+                       th:attr="hx-get=@{${base}(q=${q},page=${page + 1},size=${size},sort=${sort},dir=${dir})}"
+                       hx-target="#products-table" hx-swap="innerHTML" th:disabled="${!hasNext}">
+                Next
+                <wa-icon slot="suffix" name="chevron-right"></wa-icon>
+            </wa-button>
         </div>
     </div>
     <table class="products modern" role="grid">
         <thead>
         <tr role="row">
-            <th scope="col">ID</th><th scope="col">Title</th><th scope="col">Price</th><th scope="col">URL</th><th scope="col">Actions</th>
+            <th scope="col">
+                <a class="link" th:attr="hx-get=@{${base}(q=${q},page=${page},size=${size},sort='id',dir=${sort}=='id' ? ${nextDir} : 'asc')}"
+                   hx-target="#products-table" hx-swap="innerHTML">ID
+                    <wa-icon th:if="${sort}=='id'" name="arrow-up" th:classappend="${dir}=='asc' ? '' : ' rotate-180'"></wa-icon>
+                </a>
+            </th>
+            <th scope="col">
+                <a class="link" th:attr="hx-get=@{${base}(q=${q},page=${page},size=${size},sort='title',dir=${sort}=='title' ? ${nextDir} : 'asc')}"
+                   hx-target="#products-table" hx-swap="innerHTML">Title
+                    <wa-icon th:if="${sort}=='title'" name="arrow-up" th:classappend="${dir}=='asc' ? '' : ' rotate-180'"></wa-icon>
+                </a>
+            </th>
+            <th scope="col">
+                <a class="link" th:attr="hx-get=@{${base}(q=${q},page=${page},size=${size},sort='price',dir=${sort}=='price' ? ${nextDir} : 'asc')}"
+                   hx-target="#products-table" hx-swap="innerHTML">Price
+                    <wa-icon th:if="${sort}=='price'" name="arrow-up" th:classappend="${dir}=='asc' ? '' : ' rotate-180'"></wa-icon>
+                </a>
+            </th>
+            <th scope="col">URL</th>
+            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>

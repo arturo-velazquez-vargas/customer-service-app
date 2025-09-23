@@ -16,8 +16,24 @@ class HomeController(private val repo: ProductRepository) {
     }
 
     @GetMapping(value = ["/products", "/products/"])
-    fun products(model: Model): String {
-        model.addAttribute("products", repo.findAll(50))
+    fun products(
+        @RequestParam(name = "page", required = false, defaultValue = "0") page: Int,
+        @RequestParam(name = "size", required = false, defaultValue = "20") size: Int,
+        @RequestParam(name = "sort", required = false, defaultValue = "id") sort: String,
+        @RequestParam(name = "dir", required = false, defaultValue = "desc") dir: String,
+        model: Model
+    ): String {
+        val safeSize = size.coerceIn(1, 100)
+        val safePage = if (page < 0) 0 else page
+        val offset = safePage * safeSize
+        val list = repo.findPaged(offset = offset, size = safeSize, sort = sort, dir = dir)
+        model.addAttribute("products", list)
+        model.addAttribute("page", safePage)
+        model.addAttribute("size", safeSize)
+        model.addAttribute("sort", sort)
+        model.addAttribute("dir", dir)
+        model.addAttribute("hasPrev", safePage > 0)
+        model.addAttribute("hasNext", list.size >= safeSize)
         return "fragments/products-table :: table"
     }
 
@@ -30,10 +46,27 @@ class HomeController(private val repo: ProductRepository) {
     }
 
     @GetMapping(value = ["/products/search", "/products/search/"])
-    fun searchProducts(@RequestParam(name = "q", required = false, defaultValue = "") q: String, model: Model): String {
+    fun searchProducts(
+        @RequestParam(name = "q", required = false, defaultValue = "") q: String,
+        @RequestParam(name = "page", required = false, defaultValue = "0") page: Int,
+        @RequestParam(name = "size", required = false, defaultValue = "20") size: Int,
+        @RequestParam(name = "sort", required = false, defaultValue = "id") sort: String,
+        @RequestParam(name = "dir", required = false, defaultValue = "desc") dir: String,
+        model: Model
+    ): String {
         val query = q.trim()
-        val results = if (query.isBlank()) emptyList() else repo.searchByTitle(query, 50)
+        val safeSize = size.coerceIn(1, 100)
+        val safePage = if (page < 0) 0 else page
+        val offset = safePage * safeSize
+        val results = if (query.isBlank()) emptyList() else repo.searchByTitlePaged(query, offset, safeSize, sort, dir)
         model.addAttribute("products", results)
+        model.addAttribute("page", safePage)
+        model.addAttribute("size", safeSize)
+        model.addAttribute("sort", sort)
+        model.addAttribute("dir", dir)
+        model.addAttribute("hasPrev", safePage > 0)
+        model.addAttribute("hasNext", results.size >= safeSize)
+        model.addAttribute("q", query)
         return "fragments/products-table :: table"
     }
 
@@ -46,7 +79,18 @@ class HomeController(private val repo: ProductRepository) {
     ): String {
         val priceValue: BigDecimal? = price?.trim()?.takeIf { it.isNotEmpty() }?.let { runCatching { BigDecimal(it) }.getOrNull() }
         repo.insertManual(title = title.trim(), price = priceValue, url = url?.trim()?.takeIf { it.isNotEmpty() })
-        model.addAttribute("products", repo.findAll(50))
+        val page = 0
+        val size = 20
+        val sort = "id"
+        val dir = "desc"
+        val list = repo.findPaged(offset = page * size, size = size, sort = sort, dir = dir)
+        model.addAttribute("products", list)
+        model.addAttribute("page", page)
+        model.addAttribute("size", size)
+        model.addAttribute("sort", sort)
+        model.addAttribute("dir", dir)
+        model.addAttribute("hasPrev", false)
+        model.addAttribute("hasNext", list.size >= size)
         return "fragments/products-table :: table"
     }
 
@@ -78,7 +122,18 @@ class HomeController(private val repo: ProductRepository) {
     @PostMapping(value = ["/products/{id}/delete", "/products/{id}/delete/"])
     fun deleteProduct(@PathVariable id: Long, model: Model): String {
         repo.deleteById(id)
-        model.addAttribute("products", repo.findAll(50))
+        val page = 0
+        val size = 20
+        val sort = "id"
+        val dir = "desc"
+        val list = repo.findPaged(offset = page * size, size = size, sort = sort, dir = dir)
+        model.addAttribute("products", list)
+        model.addAttribute("page", page)
+        model.addAttribute("size", size)
+        model.addAttribute("sort", sort)
+        model.addAttribute("dir", dir)
+        model.addAttribute("hasPrev", false)
+        model.addAttribute("hasNext", list.size >= size)
         return "fragments/products-table :: table"
     }
 }
